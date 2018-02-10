@@ -1,0 +1,13 @@
+token = ''
+clansheet_url = 'https://docs.google.......'
+server_name = 'xRW Clan'
+pm_channel_name = 'lineage_chat'
+calendar_channel_name = 'schedule-announcements'
+attendance_channel_name = 'attendance-screenshots'
+#pm_channel_name = 'tamat-development-test'
+#calendar_channel_name = 'tamat-development-test'
+#attendance_channel_name = 'tamat-development-test'
+newcomer_role_name = 'Newbie'
+silent_mode = False
+admin_list = ['174554595664723968','364474437329747969']
+attendance_master_list = ['216609488621404160']
