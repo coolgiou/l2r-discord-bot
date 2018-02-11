@@ -10,6 +10,8 @@ import threading
 import traceback
 import difflib
 import datetime
+from pytz import timezone
+import pytz
 
 client = commands.Bot(command_prefix='!')
 
@@ -25,7 +27,7 @@ async def on_ready():
     print('--------')
     print('Use this link to invite {}:'.format(client.user.name))
     print('https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=536345663'.format(client.user.id))
-  return await client.change_presence(game=discord.Game(name='with your mom.')) 
+  return await client.change_presence(game=discord.Game(name='with your mom.'))
 @client.event
 async def on_message(message):
   if message.author!=client.user:
@@ -42,10 +44,10 @@ async def on_error(event, *args, **kwargs):
 #    await client.process_commands(message)
 #    if message.channel.is_private and message.author.id in settings.admin_list:
 #      await client.send_message(discord.utils.get(discord.utils.get(client.servers, name=settings.server_name).channels, name = settings.pm_channel_name),message.content)
-    
+
 @client.command(pass_context=True,brief='Helps to find mutual open cores for party')
 async def test(ctx):
-  await client.send_message(ctx.message.channel, '*usual* **__Markdown__**') 
+  await client.send_message(ctx.message.channel, '*usual* **__Markdown__**')
 
 #------------------------------------------------------------------------------
 #Cogs
@@ -57,7 +59,7 @@ class Cores():
   async def cores_close(self, ctx):
     name = ctx.message.author.display_name
     monster_name = ctx.message.content[13:]
-    await self.client.send_message(ctx.message.channel, ctx.message.author.mention + gsheets().post_core_closed(name, monster_name)) 
+    await self.client.send_message(ctx.message.channel, ctx.message.author.mention + gsheets().post_core_closed(name, monster_name))
   @commands.command(pass_context=True,brief='Helps to find mutual open cores for party')
   async def cores(self, ctx):
     def find_between(s, first, last):
@@ -123,7 +125,7 @@ class Administration():
             await self.client.delete_message(x)
             counter+=1
         self.clearing_channels.remove(ctx.message.channel)
-        await self.client.send_message(ctx.message.channel, ctx.message.author.mention + ' deleted '+str(counter)+ ' messages.')  
+        await self.client.send_message(ctx.message.channel, ctx.message.author.mention + ' deleted '+str(counter)+ ' messages.')
 
 class Calendar():
   def __init__(self,client):
@@ -137,7 +139,7 @@ class Calendar():
       condition = ctx.message.content[9:]
       calendar_list = get_calendar_desc(condition)
       if len(calendar_list)==0:
-        await self.client.send_message(ctx.message.channel, "Nothing is in calendar.") 
+        await self.client.send_message(ctx.message.channel, "Nothing is in calendar.")
       else:
         await self.client.send_message(ctx.message.channel, '\n'.join(calendar_list))
   async def run(self):
@@ -157,7 +159,7 @@ class Calendar():
       threading.Thread.__init__(self)
       self.msg_text = ''
       self.calendar_list = ''
-      self.calendar_date = datetime.datetime.utcnow().date()
+      self.calendar_date = datetime.datetime.now(tz=timezone(settings.timezone)).date()
     def run(self):
       import time
       while True:
@@ -165,7 +167,7 @@ class Calendar():
           calendar_list = get_calendar_desc()
           if self.calendar_list[:-1] != calendar_list[:-1] and len(calendar_list)>0:
             if len(self.calendar_list)>0:
-              if self.calendar_date == datetime.datetime.utcnow().date():
+              if self.calendar_date == datetime.datetime.now(tz=timezone(settings.timezone)).date():
                 msg_list = list(difflib.Differ().compare(self.calendar_list[:-1], calendar_list[:-1]))
                 new_msg_list = []
                 for el in msg_list:
@@ -179,16 +181,16 @@ class Calendar():
               else:
                 self.msg_text = '@everyone' + '\n'.join(calendar_list)
             self.calendar_list = calendar_list
-            self.calendar_date = datetime.datetime.utcnow().date()
+            self.calendar_date = datetime.datetime.now(tz=timezone(settings.timezone)).date()
         except:
           print(traceback.format_exc())
         finally:
-          time.sleep(5) 
+          time.sleep(5)
     def getMsg(self):
       result = self.msg_text
       self.msg_text = ''
       return result
-      
+
 class Attendance():
   def __init__(self,client):
     self.client = client
@@ -196,12 +198,12 @@ class Attendance():
     self.lock = asyncio.Lock()
   @commands.command(pass_context=True,brief='Admin only: Starts attendance monitoring.')
   async def start(self,ctx):
-    if (ctx.message.author.id in settings.admin_list or ctx.message.author.id in settings.attendance_master_list) and ctx.message.channel.name == settings.attendance_channel_name:  
+    if (ctx.message.author.id in settings.admin_list or ctx.message.author.id in settings.attendance_master_list) and ctx.message.channel.name == settings.attendance_channel_name:
       await client.send_message(ctx.message.channel, 'Attendance monitoring activated.')
       self.started = True
   @commands.command(pass_context=True,brief='Admin only: Stops attendance monitoring.')
   async def stop(self,ctx):
-    if (ctx.message.author.id in settings.admin_list or ctx.message.author.id in settings.attendance_master_list) and ctx.message.channel.name == settings.attendance_channel_name:  
+    if (ctx.message.author.id in settings.admin_list or ctx.message.author.id in settings.attendance_master_list) and ctx.message.channel.name == settings.attendance_channel_name:
       await client.send_message(ctx.message.channel, 'Attendance monitoring stoped.')
       self.started = False
   @commands.command(pass_context=True,brief='Use to post attendance if you are without party.')
@@ -275,12 +277,12 @@ class Notifications():
         except:
           print(traceback.format_exc())
         finally:
-          time.sleep(5) 
+          time.sleep(5)
     def getMsg(self):
       result = self.msg_text
       self.msg_text = ''
       return result
- 
+
 client.add_cog(Administration(client))
 client.add_cog(Cores(client))
 client.add_cog(Calendar(client))

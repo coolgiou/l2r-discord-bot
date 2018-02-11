@@ -8,6 +8,7 @@ attendance_channel_name = 'attendance-screenshots'
 #calendar_channel_name = 'tamat-development-test'
 #attendance_channel_name = 'tamat-development-test'
 newcomer_role_name = 'Newbie'
+timezone = 'US/Eastern' #List of tz timezones https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 silent_mode = False
 admin_list = ['174554595664723968','364474437329747969']
 attendance_master_list = ['216609488621404160']

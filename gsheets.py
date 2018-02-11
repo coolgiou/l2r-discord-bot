@@ -4,6 +4,8 @@ import pandas as pd
 from PIL import Image
 import cv2
 import settings
+from pytz import timezone
+import pytz
 
 def get_gsheet_client():
   import gspread
@@ -16,15 +18,15 @@ def get_gsheet_client():
 #Get calendar description
 #------------------------------------------------------------------------------
 def get_calendar_desc(condition = ''):
-  day_num = datetime.datetime.utcnow().day
+  day_num = datetime.datetime.now(tz=timezone(settings.timezone)).day
   if condition.find('tomorrow')>0:
     day_num = day_num+1
   else:
-    try: 
+    try:
       day_num = int(condition)
     except ValueError:
       pass
-    
+
   records = get_gsheet_client().open_by_url(settings.clansheet_url).worksheet('4. CALENDAR').get_all_values()
   result = []
   for i in range(len(records)):
@@ -35,7 +37,7 @@ def get_calendar_desc(condition = ''):
           text = row.strip()
           if text != '':
             result.append(text)
-        result.append('Current time: ' + datetime.datetime.utcnow().strftime("%H:%M:%S"))
+        result.append('Current time: ' + datetime.datetime.now(tz=timezone(settings.timezone)).strftime("%H:%M:%S"))
   return result
 #------------------------------------------------------------------------------
 #Get names from image
@@ -56,16 +58,16 @@ def dichotomy(low,up,power):
 def get_names_from_image(image):
   import pytesseract
   from math import hypot
-  
-  template = cv2.imread("clan_emblem.png")  
+
+  template = cv2.imread("clan_emblem.png")
   pytesseract.pytesseract.tesseract_cmd = 'E:\\My Projects\\Python\\la2r-discord-bot\\Tesseract-OCR\\tesseract.exe'
   if image.shape[1]>1920:
     image = cv2.resize(image, (0,0), fx=1920/image.shape[1], fy=1920/image.shape[1])
-    
+
   max_match = 0
   points = []
   for scale in np.logspace(1, -1, 20, base=2)[::-1]:
-    resized = cv2.resize(template, (0,0), fx=scale, fy=scale) 
+    resized = cv2.resize(template, (0,0), fx=scale, fy=scale)
     matchTemplate = cv2.matchTemplate(resized,image,cv2.TM_CCOEFF_NORMED)
     match = max([max(sublist) for sublist in matchTemplate])
     if max_match > match:
@@ -141,8 +143,8 @@ class gsheets:
     sheet = self.client.open_by_url(settings.clansheet_url).worksheet('7. ATTENDANCE')
     members = sheet.col_values(2)[4:]
     dates = sheet.row_values(3)[4:]
-    weekday = datetime.datetime.utcnow().weekday()
-    cur_date_column = dates.index(datetime.datetime.utcnow().date().strftime("%d/%m"))+5
+    weekday = datetime.datetime.now(tz=timezone(settings.timezone)).weekday()
+    cur_date_column = dates.index(datetime.datetime.now(tz=timezone(settings.timezone)).date().strftime("%d/%m"))+5
     for name in names:
       for i in range(len(members)):
         if members[i] == name:
@@ -158,7 +160,7 @@ class gsheets:
       return 'Empty player name.'
     temp = self.get_correct_name(player_name)
     if temp == None:
-      return 'Unrecognized name "' + player_name + '".' 
+      return 'Unrecognized name "' + player_name + '".'
     else:
       player_name = temp
     sheet = self.client.open_by_url(settings.clansheet_url).worksheet('6. CORES')
@@ -189,8 +191,8 @@ class gsheets:
     df = pd.DataFrame(sheet.get_all_records())[fields]
     df = df[df['City']!='']
     df = df[df['Boss']!='TRUE']
-    
-    
+
+
     if condition == '':
       description='Mutual open cores for ' + ', '.join(names) + ' are:'
     else:
@@ -202,7 +204,7 @@ class gsheets:
         description = 'Mutual open cores in **' + condition + '** for ' + ', '.join(names) + ' are:'
       else:
         return 'Unrecognized context "' + condition + '".'
-    
+
     for name in recognized_names:
       df = df[df[name]=='☐']
     if df.empty:
@@ -217,7 +219,7 @@ class gsheets:
       return description + '\n```\n' + text + '\n```'
   def get_notifications(self, prev_df):
     def get_date(row):
-      return datetime.datetime.combine(datetime.datetime.utcnow().date() - datetime.timedelta(days=datetime.datetime.utcnow().date().weekday()-row['weekday_num']+1),row['time'].time())
+      return datetime.datetime.combine(datetime.datetime.now(tz=timezone(settings.timezone)).date() - datetime.timedelta(days=datetime.datetime.now(tz=timezone(settings.timezone)).date().weekday()-row['weekday_num']+1),row['time'].time())
     def seconds_to_timedelta(i):
       return datetime.timedelta(seconds=i)
     def is_date_passed(in_date):
@@ -251,7 +253,7 @@ class gsheets:
 
 #for i in range(1,11):
 #  print(get_names_from_image(cv2.imread(str(i)+".png")))
-        
+
 
 #print(gsheets().post_core_closed('TaMaT', 'Sandstorm'))
 #gsheets().get_mutually_open_cores(['TaMaT'],'Giran')
