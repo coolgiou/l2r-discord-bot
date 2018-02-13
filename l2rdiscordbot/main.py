@@ -55,11 +55,22 @@ async def test(ctx):
 class Cores():
   def __init__(self, client):
     self.client = client
+  @commands.command(pass_context=True,brief='Marks cores as open')
+  async def cores_open(self, ctx):
+      if ctx.message.channel.name == settings.cores_channel_name:
+        name = ctx.message.author.display_name
+        monster_name = ctx.message.content[12:]
+        await self.client.send_message(ctx.message.channel, ctx.message.author.mention + gsheets().post_core_open(name, monster_name))
+      else:
+        await self.client.send_message(ctx.message.channel, ctx.message.author.mention + " Use the #" + settings.cores_channel_name + " channel.")
   @commands.command(pass_context=True,brief='Marks cores as closed')
   async def cores_close(self, ctx):
-    name = ctx.message.author.display_name
-    monster_name = ctx.message.content[13:]
-    await self.client.send_message(ctx.message.channel, ctx.message.author.mention + gsheets().post_core_closed(name, monster_name))
+      if ctx.message.channel.name == settings.cores_channel_name:
+        name = ctx.message.author.display_name
+        monster_name = ctx.message.content[13:]
+        await self.client.send_message(ctx.message.channel, ctx.message.author.mention + gsheets().post_core_closed(name, monster_name))
+      else:
+        await self.client.send_message(ctx.message.channel, ctx.message.author.mention + " Use the #" + settings.cores_channel_name + " channel.")
   @commands.command(pass_context=True,brief='Helps to find mutual open cores for party')
   async def cores(self, ctx):
     def find_between(s, first, last):

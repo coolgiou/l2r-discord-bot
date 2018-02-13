@@ -172,6 +172,25 @@ class gsheets:
       return 'Monster name "' + monster_name + '" not found.'
     sheet.update_cell(monster_names.index(monster_name)+2,player_names.index(player_name)+6,'☑')
     return monster_name + "'s core was marked as closed for " + player_name
+  def post_core_open(self, player_name, monster_name):
+    if monster_name == '':
+      return 'Please provide monster name, f.e.: "!cores_close Black Fang".'
+    if player_name == '':
+      return 'Empty player name.'
+    temp = self.get_correct_name(player_name)
+    if temp == None:
+      return 'Unrecognized name "' + player_name + '".'
+    else:
+      player_name = temp
+    sheet = self.client.open_by_key(settings.clansheet_url).worksheet('6. CORES')
+    player_names = sheet.row_values(1)[5:]
+    monster_names = sheet.col_values(1)[1:]
+    if not player_name in player_names:
+      return 'Player name "' + player_name + '" not found.'
+    if not monster_name in monster_names:
+      return 'Monster name "' + monster_name + '" not found.'
+    sheet.update_cell(monster_names.index(monster_name)+2,player_names.index(player_name)+6,'☐')
+    return monster_name + "'s core was marked as open for " + player_name
   def get_mutually_open_cores(self, names, condition = ''):
     if len(names)==0:
       return 'No names in list.'
