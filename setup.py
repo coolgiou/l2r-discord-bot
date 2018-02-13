@@ -9,7 +9,7 @@ setup(
         'Programming Language :: Python :: 3.6'
     ],
     keywords='lineage lineage2revolution l2r discord',
-    packages=['l2discordbot'],
+    packages=['l2rdiscordbot'],
     install_requires=[
         'discord==0.0.2',
         'gspread==0.6.2',
