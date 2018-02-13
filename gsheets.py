@@ -223,7 +223,7 @@ class gsheets:
     def seconds_to_timedelta(i):
       return datetime.timedelta(seconds=i)
     def is_date_passed(in_date):
-      return in_date<datetime.datetime.utcnow()
+      return pytz.timezone(settings.timezone).localize(in_date)<datetime.datetime.now(tz=timezone(settings.timezone))
     timetable_df = pd.DataFrame(self.client.open_by_url(settings.clansheet_url).worksheet('bot_events').get_all_records())
     periods_df = pd.DataFrame(self.client.open_by_url(settings.clansheet_url).worksheet('bot_notifications').get_all_records())
     df = pd.merge(timetable_df,periods_df, how='inner', on='event_name')
