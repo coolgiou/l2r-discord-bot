@@ -71,6 +71,17 @@ class Cores():
         await self.client.send_message(ctx.message.channel, ctx.message.author.mention + gsheets().post_core_closed(name, monster_name))
       else:
         await self.client.send_message(ctx.message.channel, ctx.message.author.mention + " Use the #" + settings.cores_channel_name + " channel.")
+  @commands.command(pass_context=True,brief='List regions and maps')
+  async def cores_regions(self, ctx):
+      if ctx.message.channel.name == settings.cores_channel_name:
+          message = gsheets().get_cities_maps()
+          if type(message)==str:
+              await self.client.send_message(ctx.message.channel, ctx.message.author.mention + message)
+          else:
+              message.set_author(name=client.user.name, icon_url=client.user.default_avatar_url)
+              await self.client.send_message(ctx.message.channel, embed = message)
+      else:
+        await self.client.send_message(ctx.message.channel, ctx.message.author.mention + " Use the #" + settings.cores_channel_name + " channel.")
   @commands.command(pass_context=True,brief='Helps to find mutual open cores for party')
   async def cores(self, ctx):
     def find_between(s, first, last):

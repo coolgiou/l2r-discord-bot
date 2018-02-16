@@ -191,6 +191,16 @@ class gsheets:
       return 'Monster name "' + monster_name + '" not found.'
     sheet.update_cell(monster_names.index(monster_name)+2,player_names.index(player_name)+6,'☐')
     return monster_name + "'s core was marked as open for " + player_name
+  def get_cities_maps(self):
+    sheet = self.client.open_by_url(settings.clansheet_url).worksheet('6. CORES')
+    fields = ['City','Map']
+    description = 'Available maps to filter core searches are:'
+    df = pd.DataFrame(sheet.get_all_records())[fields]
+    df = df.drop_duplicates(keep='last')
+    text = 'Stone    Map\n'
+    for index, row in df.iterrows():
+        text += row['City']+' '*max(9-len(row['City']),1)+row['Map']+'\n'
+    return description + '\n```\n' + text + '\n```'
   def get_mutually_open_cores(self, names, condition = ''):
     if len(names)==0:
       return 'No names in list.'
