@@ -182,7 +182,7 @@ class gsheets:
       return 'Unrecognized name "' + player_name + '".'
     else:
       player_name = temp
-    sheet = self.client.open_by_key(settings.clansheet_url).worksheet('6. CORES')
+    sheet = self.client.open_by_url(settings.clansheet_url).worksheet('6. CORES')
     player_names = sheet.row_values(1)[5:]
     monster_names = sheet.col_values(1)[1:]
     if not player_name in player_names:
